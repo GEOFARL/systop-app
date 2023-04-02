@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Menu } = require('electron');
 const log = require('electron-log');
+const Store = require('./Store');
 
 process.env.NODE_ENV = 'development';
 
@@ -7,6 +8,17 @@ const isDev = process.env.NODE_ENV === 'development';
 const isMac = process.platform === 'darwin';
 
 let mainWindow;
+
+// Init store and defaults
+const store = new Store({
+  configName: 'user-settings',
+  defaults: {
+    settings: {
+      cpuOverload: 40,
+      alertFrequency: 5,
+    },
+  },
+});
 
 function createMainWindow() {
   mainWindow = new BrowserWindow({
