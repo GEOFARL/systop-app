@@ -1,8 +1,11 @@
-const { app, Menu, ipcMain, Tray } = require('electron');
+const { app, Menu, ipcMain, BrowserWindow } = require('electron');
 const MainWindow = require('./MainWindow');
 const path = require('path');
 const log = require('electron-log');
+log.transports.file.resolvePath = () =>
+  path.join(__dirname, 'logs', 'main.log');
 const Store = require('./Store');
+const AppTray = require('./AppTray');
 
 process.env.NODE_ENV = 'development';
 
@@ -29,6 +32,7 @@ function createMainWindow() {
 
 // Set settings
 ipcMain.on('settings:set', (e, value) => {
+  log.info(value);
   store.set('settings', value);
   mainWindow.webContents.send('settings:get', store.get('settings'));
 });
@@ -54,28 +58,7 @@ app.on('ready', () => {
   const icon = path.join(__dirname, 'icons', 'tray_icon.png');
 
   // Create tray
-  tray = new Tray(icon);
-
-  tray.on('click', () => {
-    if (mainWindow.isVisible()) {
-      mainWindow.hide();
-    } else {
-      mainWindow.show();
-    }
-  });
-
-  tray.on('right-click', () => {
-    const contextMenu = Menu.buildFromTemplate([
-      {
-        label: 'Quit',
-        click: () => {
-          app.isQuitting = true;
-          app.quit();
-        },
-      },
-    ]);
-    tray.popUpContextMenu(contextMenu);
-  });
+  tray = new AppTray(icon, mainWindow);
 
   Menu.setApplicationMenu(mainMenu);
 });
