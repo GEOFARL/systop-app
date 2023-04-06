@@ -72,7 +72,6 @@
     <script src="js/monitor.js"></script>
     <script>
       // Get settings
-      const { ipcRenderer } = require('electron');
       const settingsForm = document.getElementById('settings-form');
 
       ipcRenderer.on('settings:get', (e, settings) => {
